@@ -1,4 +1,7 @@
 # OpenAI Agent SDK Mastery: Course Overview & Detailed Curriculum
+
+[![Proprietary License](https://img.shields.io/badge/license-proprietary-red.svg)](./LICENSE)
+
 ---
 
 ### **Part 1: The Foundational Layer & Course Overview**
@@ -132,7 +135,3 @@ This final level focuses on optimizing agents for production, exploring voice ca
 * **Day 45: Final Thoughts & Course Conclusion**
     * A comprehensive review of your entire journey and a look at the future of AI agents.
 
----
-
-## License
-This project is licensed under the [MIT License](./LICENSE).
