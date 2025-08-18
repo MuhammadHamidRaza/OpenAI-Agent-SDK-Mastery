@@ -131,3 +131,8 @@ This final level focuses on optimizing agents for production, exploring voice ca
     * This is your final project: build an all-in-one assistant that integrates voice, real-time data, and a multi-agent system.
 * **Day 45: Final Thoughts & Course Conclusion**
     * A comprehensive review of your entire journey and a look at the future of AI agents.
+
+---
+
+## License
+This project is licensed under the [MIT License](./LICENSE).
