@@ -1,6 +1,11 @@
 
 # Day 1: Intro to AI Agents & Your First Agent!
 
+[![Proprietary License](https://img.shields.io/badge/license-proprietary-red.svg)](../LICENSE)
+
+---
+
+
 ### **Course Overview**
 
 Welcome to Day 1 of the **OpenAI Agent SDK Mastery** course! Today, we're setting the stage for our 45-day journey. We'll start with the foundational concepts of agentic AI and then use the SDK to create and run your very first agent.

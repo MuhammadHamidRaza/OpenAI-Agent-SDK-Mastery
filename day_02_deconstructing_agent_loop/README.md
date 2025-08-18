@@ -1,5 +1,9 @@
 # Day 02 — Deconstructing the Agent Loop & Sessions 
 
+[![Proprietary License](https://img.shields.io/badge/license-proprietary-red.svg)](../LICENSE)
+
+---
+
 ### **Course Overview**
 
 Course Overview
