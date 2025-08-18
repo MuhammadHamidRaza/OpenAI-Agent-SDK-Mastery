@@ -200,11 +200,16 @@ When to use: UIs, progress indicators, or any student/developer experience where
 
 The SDK raises a few important exceptions. Handle them so your app stays stable.
 
-- `` — base class for all SDK errors (catch for a general fallback).
-- `` — the run exceeded the allowed number of loop turns (increase `max_turns` or simplify prompts).
-- `` — the model produced invalid output (e.g., malformed JSON when a structured `output_type` was expected).
-- `` — your code called the SDK incorrectly (wrong types or bad config).
-- ``** / **`` — guardrails blocked the run due to safety or validation rules.
+
+-   `AgentsException`: This is the base class for all exceptions raised within the SDK. It serves as a generic type from which all other specific exceptions are derived.
+-   `MaxTurnsExceeded`: This exception is raised when the agent's run exceeds the  `max_turns`  limit passed to the  `Runner.run`,  `Runner.run_sync`, or  `Runner.run_streamed`  methods. It indicates that the agent could not complete its task within the specified number of interaction turns.
+-   `ModelBehaviorError`: This exception occurs when the underlying model (LLM) produces unexpected or invalid outputs. This can include:
+    -   Malformed JSON: When the model provides a malformed JSON structure for tool calls or in its direct output, especially if a specific  `output_type`  is defined.
+    -   Unexpected tool-related failures: When the model fails to use tools in an expected manner
+-   `UserError`: This exception is raised when you (the person writing code using the SDK) make an error while using the SDK. This typically results from incorrect code implementation, invalid configuration, or misuse of the SDK's API.
+-   `InputGuardrailTripwireTriggered`,  `OutputGuardrailTripwireTriggered`: This exception is raised when the conditions of an input guardrail or output guardrail are met, respectively. Input guardrails check incoming messages before processing, while output guardrails check the agent's final response before delivery.
+    
+
 
 **Catch example**
 
