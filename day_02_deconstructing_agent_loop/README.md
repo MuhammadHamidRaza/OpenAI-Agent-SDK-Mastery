@@ -105,13 +105,46 @@ print('Final:', final.final_output)
 
 # 4 — RunResult: how to read what happened
 
-After a run you get a `RunResult` (or `RunResultStreaming`). Inspect it in this order:
+# RunResult and RunResultStreaming Overview
 
-1. ``: the final human-facing answer (often a `str`). If present, the run ended with an answer.
-2. ``: which agent produced the final answer (useful if handoffs happened).
-3. ``: chronological list of items (messages, tool calls, tool outputs, handoffs, reasoning items).
-4. ``: low-level model responses & metadata (tokens, model info) — helpful for debugging.
-5. ``: convert the run + items into an input list you can pass into the Runner again (manual continuation without sessions).
+When you call `Runner.run` or `run_sync`, you get a **RunResult**. If you use `run_streamed`, you get a **RunResultStreaming**. Both inherit from **RunResultBase**. Below are the properties in the specified order:
+
+## Final Output
+
+- **`final_output`**: The final answer from the last agent.
+  - Type: `str` if no output type is defined.
+  - Type: Object of type `last_agent.output_type` if defined.
+  - Type: `Any` because handoffs mean different agents may finish.
+
+## Inputs for Next Turn
+
+- **`to_input_list()`**: Creates a list combining the original input with all new items. Useful for continuing manually without sessions.
+
+## Last Agent
+
+- **`last_agent`**: The agent that produced the final answer. Helpful for resuming with the same specialist.
+
+## New Items
+
+- **`new_items`**: Chronological list of `RunItems` from the run.
+  - **`MessageOutputItem`**: Message from the LLM.
+  - **`HandoffCallItem`**: The LLM requested a handoff.
+  - **`HandoffOutputItem`**: The handoff was executed (source/target agents accessible).
+  - **`ToolCallItem`**: The LLM invoked a tool.
+  - **`ToolCallOutputItem`**: Response from the tool (tool output accessible).
+  - **`ReasoningItem`**: Reasoning traces from the LLM.
+
+## Guardrail Results
+
+- **`input_guardrail_results` / `output_guardrail_results`**: Validation results from guardrails, useful for logging and safety.
+
+## Raw Responses
+
+- **`raw_responses`**: Low-level `ModelResponses` from the LLM (tokens, metadata).
+
+## Original Input
+
+- **`input`**: The original input provided to the run method.
 
 **Quick inspect example**
 
