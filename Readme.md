@@ -46,7 +46,7 @@ This foundational level introduces the core concepts and the fundamental buildin
     * Learn to convert any Python function into a powerful agent tool using the `@function_tool` decorator.
 * **Day 6: Integrating Basic Tools**
     * Pass tools to your agent and observe how it dynamically selects and uses them.
-* **Day 7: Hosted Tools: Web & File Search**
+* **Day 7: Hosted Tools: Web Search**
     * Leverage built-in tools like `WebSearchTool` to give your agent access to real-time information.
 * **Day 8: Intro to Agent Memory**
     * Learn the importance of memory for conversational continuity and the distinction between short-term and long-term memory.
