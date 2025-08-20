@@ -48,4 +48,4 @@ Infinite loop’s dance.
 - Try changing the instructions:
   - E.g., `"You are a helpful assistant. Write limericks about Python."`
 - Run multiple prompts and observe agent outputs.
-- Optional: Create `examples/haiku_agent.py` for experimentation.
+- Check the `example/` directory for `openai_haiku_agent.py` and `gemini_haiku_agent.py` for experimentation.
