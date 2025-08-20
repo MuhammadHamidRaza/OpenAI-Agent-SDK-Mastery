@@ -147,4 +147,12 @@ Similar to the `CalculatorAgent`, the `GreeterAgent` will use the `greet_user` t
 *   The SDK handles the entire function calling lifecycle: from the LLM suggesting a tool call, to executing the Python function, and feeding the output back to the LLM.
 *   By integrating tools, your agents gain the ability to perform real-world actions and access dynamic information, significantly expanding their utility.
 
+---
+
+## Summary
+
+Tools + function calling turn LLMs into *actors* — agents that can fetch live data, calculate precisely, and interact with systems. Use `@function_tool` to wrap Python functions, register them on your agent, and let the agent decide when to call them. Design tools carefully, validate inputs, and handle errors to build safe, reliable agentic apps.
+
+---
+
 Today, you've made your agents truly interactive by giving them the ability to use custom tools. Tomorrow, we'll explore how to leverage powerful, pre-built tools like web search and file search to give your agents access to vast amounts of information.

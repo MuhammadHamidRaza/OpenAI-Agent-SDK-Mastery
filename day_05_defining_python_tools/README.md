@@ -138,6 +138,52 @@ print("Tool 'greet_user' defined successfully. Ready for agent integration.")
 
 ---
 
+## 4) Registering multiple tools & letting the agent choose
+
+You can provide a list of tools; the LLM decides which to call based on the query.
+
+```python
+@function_tool
+def multiply(x: int, y: int) -> int:
+    return x * y
+
+agent = Agent(name="Calc", instructions="Use tools for math.", tools=[add_numbers, multiply])
+```
+
+---
+
+## Handling errors in function tools
+
+When you create a function tool via `@function_tool`, you can pass a `failure_error_function`. This is a function that provides an error response to the LLM in case the tool call crashes.
+
+By default (i.e. if you don't pass anything), it runs a `default_tool_error_function` which tells the LLM an error occurred.
+If you pass your own error function, it runs that instead, and sends the response to the LLM.
+If you explicitly pass `None`, then any tool call errors will be re-raised for you to handle. This could be a `ModelBehaviorError` if the model produced invalid JSON, or a `UserError` if your code crashed, etc.
+
+```python
+from agents import function_tool, RunContextWrapper
+from typing import Any
+
+def my_custom_error_function(context: RunContextWrapper[Any], error: Exception) -> str:
+    """A custom function to provide a user-friendly error message."""
+    print(f"A tool call failed with the following error: {error}")
+    return "An internal server error occurred. Please try again later."
+
+@function_tool(failure_error_function=my_custom_error_function)
+def get_user_profile(user_id: str) -> str:
+    """Fetches a user profile from a mock API.
+     This function demonstrates a 'flaky' or failing API call.
+    """
+    if user_id == "user_123":
+        return "User profile for user_123 successfully retrieved."
+    else:
+        raise ValueError(f"Could not retrieve profile for user_id: {user_id}. API returned an error.")
+```
+If you are manually creating a `FunctionTool` object, then you must handle errors inside the `on_invoke_tool` function.
+
+---
+
 ## What's Next?
 
 Today, you've learned the fundamental skill of defining custom tools using `@function_tool`. Tomorrow, on Day 6, we will take the next crucial step: **integrating these tools with your agents** and observing how the agent dynamically selects and uses them to fulfill user requests. Get ready to see your agents become even more capable!
+
