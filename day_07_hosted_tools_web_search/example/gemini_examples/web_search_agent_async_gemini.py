@@ -1,50 +1,63 @@
 import asyncio
-import google.generativeai as genai
-import os
-from default_api import google_web_search
+import requests
+from agents import Agent, Runner, OpenAIChatCompletionsModel, function_tool
+from openai import AsyncOpenAI
 
-# --- Tool Definition ---
+# ✅ Gemini client setup
+client = AsyncOpenAI(
+    api_key="GEMINI_API_KEY",
+    base_url="https://generativelanguage.googleapis.com/v1beta/openai/"
+)
 
+# ✅ Gemini model
+model = OpenAIChatCompletionsModel(
+    model="gemini-1.5-flash",
+    openai_client=client
+)
+
+@function_tool
 def web_search(query: str):
     """
-    Performs a web search using Google Search.
+    Performs a web search using Google Custom Search API.
 
     Args:
         query: The search query.
+    Returns:
+        List of dictionaries containing title, link, and description.
     """
-    print(f"--- Calling Web Search Tool with query: {query} ---")
-    return google_web_search(query=query)
 
-# --- Agent Setup ---
+    API_KEY = "GOOGLE_API_KEY"
+    CX = "Search_Engine_Id"
+    num_results = 10  # max 10 per request
 
-def create_search_agent():
-    api_key = os.environ.get("GEMINI_API_KEY", "YOUR_API_KEY")
-    if api_key == "YOUR_API_KEY":
-        print("Please set the GEMINI_API_KEY environment variable or replace 'YOUR_API_KEY'.")
-        return None
+    url = f"https://www.googleapis.com/customsearch/v1?q={query}&key={API_KEY}&cx={CX}&num={num_results}"
 
-    genai.configure(api_key=api_key)
+    response = requests.get(url)
+    data = response.json()
 
-    model = genai.GenerativeModel(
-        model_name='gemini-1.5-flash',
-        tools=[web_search]
-    )
-    return model
+    results = []
+    for item in data.get("items", []):
+        results.append({
+            "title": item.get("title"),
+            "link": item.get("link"),
+            "description": item.get("snippet")
+        })
+    print(results)
+    return results
+
+# ✅ Create the agent
+agent = Agent(
+    name="SearchBuddyAsync",
+    instructions="What is Ai.",
+    tools=[web_search],
+    model=model
+)
 
 async def main():
-    model = create_search_agent()
-    if model is None:
-        return
-
-    chat = model.start_chat(enable_automatic_function_calling=True)
-
-    prompt = "What's the latest news about artificial intelligence?"
-    print(f"User Prompt: {prompt}\n")
-
-    response = await chat.send_message_async(prompt)
-
-    print("\n--- Final Model Response ---")
-    print(response.text)
+    result = await Runner.run(
+        agent, "What are the top headlines about climate technology today?"
+    )
+    print(result.final_output)
 
 if __name__ == "__main__":
     asyncio.run(main())

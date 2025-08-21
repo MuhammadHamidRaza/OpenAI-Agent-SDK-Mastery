@@ -1,20 +1,49 @@
 import asyncio
-import google.generativeai as genai
-import os
-from default_api import google_web_search
+from agents import Agent, Runner, function_tool, OpenAIChatCompletionsModel
+from openai import AsyncOpenAI
 
-# --- Tool Definitions ---
+# ✅ Gemini client setup
+client = AsyncOpenAI(
+    api_key="GEMINI_API_KEY",
+    base_url="https://generativelanguage.googleapis.com/v1beta/openai/"
+)
 
+# ✅ Gemini model
+model = OpenAIChatCompletionsModel(
+    model="gemini-1.5-flash",
+    openai_client=client
+)
+@function_tool
 def web_search(query: str):
     """
-    Performs a web search using Google Search.
+    Performs a web search using Google Custom Search API.
 
     Args:
         query: The search query.
+    Returns:
+        List of dictionaries containing title, link, and description.
     """
-    print(f"--- Calling Web Search Tool with query: {query} ---")
-    return google_web_search(query=query)
 
+    API_KEY = "GOOGLE_API_KEY"
+    CX = "Search_Engine_Id"
+    num_results = 10  # max 10 per request
+
+    url = f"https://www.googleapis.com/customsearch/v1?q={query}&key={API_KEY}&cx={CX}&num={num_results}"
+
+    response = requests.get(url)
+    data = response.json()
+
+    results = []
+    for item in data.get("items", []):
+        results.append({
+            "title": item.get("title"),
+            "link": item.get("link"),
+            "description": item.get("snippet")
+        })
+    print(results)
+    return results  # ✅ Return a proper list
+
+@function_tool
 def user_preferences(user_id: str) -> str:
     """Fetch stored user preferences for coffee shops.
 
@@ -32,39 +61,25 @@ def user_preferences(user_id: str) -> str:
     }
     return prefs.get(user_id, "no preferences")
 
-# --- Agent Setup ---
-
-def create_cafe_finder_agent():
-    api_key = os.environ.get("GEMINI_API_KEY", "YOUR_API_KEY")
-    if api_key == "YOUR_API_KEY":
-        print("Please set the GEMINI_API_KEY environment variable or replace 'YOUR_API_KEY'.")
-        return None
-
-    genai.configure(api_key=api_key)
-
-    model = genai.GenerativeModel(
-        model_name='gemini-1.5-flash',
-        tools=[web_search, user_preferences]
-    )
-    return model
+agent = Agent(
+    name="CafeFinder",
+    instructions=(
+        "Help the user choose a coffee shop in San Francisco. "
+        "Use WebSearchTool for current weather and shop info, "
+        "and incorporate user_preferences(user_id) for personalization."
+    ),
+    tools=[web_search, user_preferences],
+    model=model
+)
 
 async def main():
-    model = create_cafe_finder_agent()
-    if model is None:
-        return
-
-    chat = model.start_chat(enable_automatic_function_calling=True)
-
     prompt = (
         "User user_123: Which coffee shop should I go to today in San Francisco, "
         "considering my preferences and today's weather?"
     )
-    print(f"User Prompt: {prompt}\n")
-
-    response = await chat.send_message_async(prompt)
-
-    print("\n=== Recommendation ===")
-    print(response.text)
+    result = await Runner.run(agent, prompt)
+    print("=== Recommendation ===")
+    print(result.final_output)
 
 if __name__ == "__main__":
     asyncio.run(main())
