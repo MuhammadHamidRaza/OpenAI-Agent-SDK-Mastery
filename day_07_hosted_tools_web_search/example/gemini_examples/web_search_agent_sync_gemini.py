@@ -42,7 +42,6 @@ def web_search(query: str):
             "link": item.get("link"),
             "description": item.get("snippet")
         })
-    print(results)
     return results  # ✅ Return a proper list
 
 # ✅ Create the agent
