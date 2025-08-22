@@ -35,7 +35,7 @@ Inspecting the `RunResult` is crucial for debugging, understanding agent behavio
 
 ```python
 from agents import Agent, Runner
-from agents.tools import function_tool
+from agents import function_tool
 import os
 
 # Ensure the OpenAI API key is set
@@ -95,6 +95,8 @@ for item in result.new_items:
 
 ## Implementing Streaming for Enhanced User Experience
 
+Streaming lets you subscribe to updates of the agent run as it proceeds. This can be useful for showing the end-user progress updates and partial responses. To stream, you can call Runner.run_streamed(), which will give you a RunResult.
+
 While `RunResult` provides the complete picture after execution, waiting for the entire process to finish can lead to perceived latency, especially for complex tasks. **Streaming** allows you to receive partial outputs and events as they happen, providing real-time feedback to the user.
 
 The `Runner.run_streamed()` method is designed for this purpose. Instead of returning a single `RunResult` at the end, it returns an iterable `RunResultStreaming` object that yields `RunItem` events as the agent progresses.
@@ -108,6 +110,7 @@ The `Runner.run_streamed()` method is designed for this purpose. Instead of retu
 ### Example: Agent with Streaming Output
 
 ```python
+import asyncio # Added
 from agents import Agent, Runner
 import os
 
@@ -118,32 +121,51 @@ if "OPENAI_API_KEY" not in os.environ:
     print("Please set the OPENAI_API_KEY environment variable.")
     exit()
 
-agent = Agent(
-    name="StreamingAssistant",
-    instructions="You are a verbose assistant that explains concepts step-by-step."
-)
+@function_tool
+def how_many_jokes() -> int:
+    import random
 
-print("Running StreamingAssistant with real-time output...")
+    return random.randint(1, 10)
 
-# Use a 'with' statement for run_streamed to ensure proper resource management
-with Runner.run_streamed(agent, "Explain the concept of photosynthesis in simple terms.") as stream:
-    for event in stream:
-        # Check the type of event to handle it appropriately
-        if hasattr(event, 'text'):
-            # This is a message from the LLM, print it as it comes
-            print(event.text, end="", flush=True)
-        elif hasattr(event, 'tool_name'):
-            # An agent decided to call a tool
-            print(f"\n[TOOL CALL: {event.tool_name} with args {event.tool_args}]\n", end="", flush=True)
-        elif hasattr(event, 'output'):
-            # Output from a tool call
-            print(f"\n[TOOL OUTPUT: {event.output}]\n", end="", flush=True)
-        # You can add more elif conditions for other RunItem types like ReasoningItem, HandoffCallItem etc.
 
-    # After the loop, the stream is complete. You can get the final result.
-    final_result = stream.get_final_result()
-    print(f"\n\n--- Streaming Complete ---")
-    print(f"Final Output (from get_final_result): {final_result.final_output[:100]}...") # Print first 100 chars
+async def main():
+    agent = Agent(
+        name="StreamingAssistant",
+        instructions="First call the `how_many_jokes` tool, then tell that many jokes.",
+        tools=[how_many_jokes],
+    )
+
+    result = Runner.run_streamed(agent, input="Hello")
+    print("=== Streaming started ===")
+
+    async for event in result.stream_events():
+        # Ignore raw token events
+        if event.type == "raw_response_event":
+            continue
+
+        # Agent update events
+        elif event.type == "agent_updated_stream_event":
+            print(f"[Agent Updated] New agent: {event.new_agent.name}")
+            continue
+
+        # Item-level events
+        elif event.type == "run_item_stream_event":
+            if event.item.type == "tool_call_item":
+                print("-- Tool was called")
+            elif event.item.type == "tool_call_output_item":
+                print(f"-- Tool output: {event.item.output}")
+            elif event.item.type == "message_output_item":
+                print(
+                    f"-- Message output:\n {ItemHelpers.text_message_output(event.item)}"
+                )
+            else:
+                pass  # Ignore other event types
+
+    
+
+
+if __name__ == "__main__":
+    asyncio.run(main())
 
 ```
 
@@ -155,6 +177,10 @@ with Runner.run_streamed(agent, "Explain the concept of photosynthesis in simple
 *   You can add logic to handle other `RunItem` types (like `ToolCallItem` or `ToolCallOutputItem`) to provide even richer real-time feedback.
 *   `stream.get_final_result()` allows you to retrieve the complete `RunResult` object after the streaming is finished.
 
+### Handling Raw Responses Stream Events
+
+Beyond the higher-level `RunItem` events, you might encounter `RawResponsesStreamEvent`. These are raw events passed directly from the LLM. They are in OpenAI Responses API format, which means each event has a type (like `response.created`, `response.output_text.delta`, etc.) and data. These events are useful if you want to stream raw, token-level responses directly from the model, giving you the most granular control over the output.
+
 ---
 
 ## Key Takeaways
@@ -163,4 +189,3 @@ with Runner.run_streamed(agent, "Explain the concept of photosynthesis in simple
 *   `Runner.run_streamed()` enables real-time delivery of agent outputs and events, significantly improving user experience in interactive applications.
 *   By combining `RunResult` inspection with streaming, you gain powerful capabilities for debugging, monitoring, and building dynamic agent interfaces.
 
-Tomorrow, we'll build upon our understanding of agent execution by exploring **Tracing**, a powerful feature for visualizing and debugging your agent's workflow, giving you even deeper insights into its internal processes.
