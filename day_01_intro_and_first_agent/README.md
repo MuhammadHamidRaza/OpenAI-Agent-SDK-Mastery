@@ -21,6 +21,17 @@ An AI agent is more than just a large language model (LLM). It’s an intelligen
 -   **Act/Action**: Perform an action, which could be giving a final answer, running a tool, or delegating a task. Think of an LLM as the brain, while the agent is the full body, equipped with senses (tools) and the ability to act on the world. This is what makes agents so powerful for building real-world applications.
     
 
+## What is an SDK?
+An **SDK (Software Development Kit)** is a set of tools, libraries, and documentation that helps developers build applications more easily.  
+Think of it as a **toolbox**: instead of building everything from scratch, you get ready-made tools and code that speed up development.  
+
+For example:
+- Without an SDK → you would need to write low-level code for everything.
+- With an SDK → you can use pre-built methods, functions, and helpers to focus on your app’s logic.
+
+The **OpenAI Agent SDK** provides these tools to build intelligent, agent-based AI applications quickly and efficiently.
+
+
 ## Analogy for a 5-Year-Old
 
 Imagine you're in a big school with many teachers.
