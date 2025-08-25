@@ -6,11 +6,30 @@
 
 ### **Course Overview**
 
-Welcome to Day 11 of the **OpenAI Agent SDK Mastery** course! After ten days of building foundational knowledge—from understanding agents and their execution to defining tools, managing memory, and observing behavior through tracing—it's time to synthesize these concepts into your first complete project. Today, you will build a **Simple Q&A Agent**. This project will solidify your understanding of how different components of the OpenAI Agents SDK work together to create a functional and intelligent application. You'll define an agent, equip it with a tool for information retrieval, and ensure it can maintain context across turns using sessions, all while being able to trace its operations for debugging.
+Welcome to Day 11 of the **OpenAI Agent SDK Mastery** course! After ten days of building foundational knowledge—from understanding agents and their execution to defining tools, managing memory, and observing behavior through tracing—it's time to synthesize these concepts into your first complete project. Today, you will build a **Simple Q&A Agent**. This project will solidify your understanding of how different components of the OpenAI Agents SDK work together to create a functional and intelligent application.
 
 ---
 
-## Project Goal: Build a Simple Q&A Agent
+### **TL;DR**
+
+*   Combine `Agent`, `WebSearchTool`, `SQLiteSession`, and `Runner` to build a conversational Q&A agent.
+*   Use `WebSearchTool` to give the agent access to real-time information.
+*   Use `SQLiteSession` to maintain conversation history.
+*   Inspect `RunResult` to understand the agent's behavior.
+
+---
+
+### **Objectives**
+
+*   Build a complete Q&A agent from scratch.
+*   Integrate a hosted tool (`WebSearchTool`) with an agent.
+*   Implement conversational memory using `SQLiteSession`.
+*   Run and test a multi-turn conversation with an agent.
+*   Inspect the agent's execution flow using `RunResult`.
+
+---
+
+## 1) Project Goal: Build a Simple Q&A Agent
 
 Your goal for today is to create an agent that can answer general knowledge questions. To make it truly useful, it should be able to:
 
@@ -18,26 +37,26 @@ Your goal for today is to create an agent that can answer general knowledge ques
 2.  **Maintain conversation context** across multiple turns.
 3.  Allow for **observability** of its internal workings.
 
-### Components We'll Use:
+---
+
+## 2) Components We'll Use
 
 *   **Agent:** The core intelligent entity.
-*   **`WebSearchTool`:** To fetch up-to-date information (as discussed on Day 7).
-*   **`SQLiteSession`:** To manage conversational memory (as discussed on Day 2 and Day 8).
-*   **`Runner`:** To execute the agent (as discussed on Day 3).
-*   **Tracing/`RunResult`:** To inspect the agent's behavior (as discussed on Day 9 and Day 10).
+*   **`WebSearchTool`:** To fetch up-to-date information.
+*   **`SQLiteSession`:** To manage conversational memory.
+*   **`Runner`:** To execute the agent.
+*   **Tracing/`RunResult`:** To inspect the agent's behavior.
 
 ---
 
-## Step-by-Step Implementation
+## 3) Step-by-Step Implementation
 
-### Step 1: Setup and Tool Definition
-
-First, ensure your environment is set up with your OpenAI API key. We'll define the `WebSearchTool`. Remember that for `WebSearchTool`, you might need additional API keys for the underlying search service (e.g., Google Custom Search API).
+Here is the complete code for the Simple Q&A Agent.
 
 ```python
 import os
 from agents import Agent, Runner, SQLiteSession
-from agents.tools import WebSearchTool # Assuming this is available and configured
+from agents import WebSearchTool
 
 # ---
 # Configuration ---
@@ -47,56 +66,24 @@ if "OPENAI_API_KEY" not in os.environ:
     print("Please set it before running the agent.")
     exit()
 
-# If using WebSearchTool that requires Google API Key and CSE ID
-# if "GOOGLE_API_KEY" not in os.environ or "GOOGLE_CSE_ID" not in os.environ:
-#     print("Warning: GOOGLE_API_KEY or GOOGLE_CSE_ID not set. WebSearchTool might not function.")
-#     # You might want to exit or handle this gracefully based on your needs
 
-# Initialize the WebSearchTool
-# Note: The actual initialization might vary based on your SDK version and search backend.
-# For demonstration, we assume a basic initialization.
-web_search_tool = WebSearchTool()
-
-print("Setup complete and WebSearchTool initialized.")
-```
-
-### Step 2: Define Your Q&A Agent
-
-Now, create your `Agent` instance. Provide clear instructions and pass the `web_search_tool` to it.
-
-```python
-# ... (previous code for imports and setup) ...
-
+# ---
+# 1. Define the Agent ---
 qa_agent = Agent(
     name="KnowledgeAgent",
     instructions="You are a helpful and knowledgeable assistant. Use the web search tool to find answers to questions. If you cannot find an answer, politely state that you don't know.",
-    tools=[web_search_tool] # Provide the web search tool to the agent
+    tools=[WebSearchTool()]
 )
+print("Q&A Agent defined.")
 
-print("Q&A Agent defined with WebSearchTool.")
-```
-
-### Step 3: Implement Conversational Memory with `SQLiteSession`
-
-To make the agent remember past interactions, we'll use `SQLiteSession`. This will allow for multi-turn conversations.
-
-```python
-# ... (previous code for imports, setup, and agent definition) ...
-
-# Initialize a session. You can use a unique session ID for each user or conversation.
+# ---
+# 2. Initialize the Session ---
 # The database file 'qa_chat_history.db' will be created/used in the current directory.
 session = SQLiteSession("user_qa_session", "qa_chat_history.db")
+print("SQLiteSession initialized.")
 
-print("SQLiteSession initialized for conversational memory.")
-```
-
-### Step 4: Run the Agent and Test Conversational Flow
-
-Now, let's run the agent with a few questions, demonstrating how it uses the tool and remembers context.
-
-```python
-# ... (previous code for imports, setup, agent definition, and session initialization) ...
-
+# ---
+# 4. Run the Conversation ---
 print("\n--- Starting Q&A Conversation ---")
 
 # First turn
@@ -104,7 +91,7 @@ print("\nUser: What is the capital of France?")
 result1 = Runner.run_sync(qa_agent, "What is the capital of France?", session=session)
 print(f"Agent: {result1.final_output}")
 
-# Second turn, building on context (agent should remember the previous topic)
+# Second turn, building on context
 print("\nUser: And what is its population?")
 result2 = Runner.run_sync(qa_agent, "And what is its population?", session=session)
 print(f"Agent: {result2.final_output}")
@@ -116,18 +103,8 @@ print(f"Agent: {result3.final_output}")
 
 print("\n--- Conversation End ---")
 
-# Optional: Clear the session if you want to start fresh for next run
-# session.clear_session()
-# print("Session cleared.")
-```
-
-### Step 5: Observe with Tracing (Optional but Recommended)
-
-To see how the agent makes decisions and uses the tool, you can inspect the `RunResult` objects. This is crucial for debugging and understanding.
-
-```python
-# ... (previous code for imports, setup, agent definition, session initialization, and conversation) ...
-
+# ---
+# 5. Inspect the RunResult ---
 print("\n--- Inspecting RunResult for the first turn ---")
 print(f"Final Output (Turn 1): {result1.final_output}")
 print("Events in Turn 1:")
@@ -141,24 +118,22 @@ for item in result1.new_items:
     if hasattr(item, 'output'):
         print(f"    Tool Output: {item.output[:50]}...")
 
-print("\n--- Inspecting RunResult for the second turn ---")
-print(f"Final Output (Turn 2): {result2.final_output}")
-print("Events in Turn 2:")
-for item in result2.new_items:
-    print(f"  - Type: {type(item).__name__}")
-    if hasattr(item, 'text'):
-        print(f"    Text: {item.text[:50]}...")
-    if hasattr(item, 'tool_name'):
-        print(f"    Tool Called: {item.tool_name}")
-        print(f"    Tool Args: {item.tool_args}")
-    if hasattr(item, 'output'):
-        print(f"    Tool Output: {item.output[:50]}...")
-
 ```
 
 ---
 
-## Key Takeaways from Project 1
+## 4) How it Works
+
+1.  **Configuration:** The code first checks for the `OPENAI_API_KEY` environment variable.
+2.  **Tool Initialization:** It initializes the `WebSearchTool`, which will be used by the agent to search the web.
+3.  **Agent Definition:** An `Agent` is created with a name, instructions, and the `WebSearchTool`. The instructions guide the agent on how to behave and when to use the tool.
+4.  **Session Initialization:** A `SQLiteSession` is created to store the conversation history. This allows the agent to remember previous turns.
+5.  **Conversation Execution:** The `Runner.run_sync()` method is used to execute the agent for each turn of the conversation. The `session` object is passed to the runner to maintain context.
+6.  **RunResult Inspection:** After the conversation, the `RunResult` object from the first turn is inspected to show the events that occurred during the agent's execution, including the tool call.
+
+---
+
+## 5) Key Takeaways from Project 1
 
 *   You've successfully built your first complete AI agent, integrating multiple core concepts of the OpenAI Agents SDK.
 *   The `WebSearchTool` allows your agent to access dynamic, real-time information, overcoming the LLM's knowledge cut-off.

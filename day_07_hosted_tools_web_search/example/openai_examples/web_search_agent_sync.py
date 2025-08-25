@@ -3,7 +3,7 @@ from agents import Agent, Runner
 
 agent = Agent(
     name="SearchBuddySync",
-    instructions="Answer user questions using web search when needed.",
+    instructions="Answer user  questions using web search when needed.",
     tools=[WebSearchTool()],
 )
 
