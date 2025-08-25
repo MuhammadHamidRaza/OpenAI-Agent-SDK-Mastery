@@ -1,4 +1,3 @@
-# day08_custom_session.py
 from typing import List
 from agents.memory import Session  # protocol interface
 
@@ -13,8 +12,8 @@ class MyCustomSession(Session):
     async def add_items(self, items: List[dict]) -> None:
         self._items.extend(items)
 
-    async def pop_item() -> dict | None:
+    async def pop_item(self) -> dict | None:
         return self._items.pop() if self._items else None
 
-    async def clear_session() -> None:
+    async def clear_session(self) -> None:
         self._items.clear()

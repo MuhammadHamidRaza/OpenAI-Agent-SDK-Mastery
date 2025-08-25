@@ -1,25 +1,11 @@
-# day08_support_bot.py
-from agents import Agent, Runner, SQLiteSession, OpenAIChatCompletionsModel
-from openai import AsyncOpenAI
+import asyncio
+from agents import Agent, Runner, SQLiteSession
 
 class SupportBot:
     def __init__(self):
-        # Gemini client setup
-        self.client = AsyncOpenAI(
-            api_key="GEMINI_API_KEY",
-            base_url="https://generativelanguage.googleapis.com/v1beta/openai/"
-        )
-
-        # Gemini model
-        self.model = OpenAIChatCompletionsModel(
-            model="gemini-2.5-flash",
-            openai_client=self.client
-        )
-
         self.agent = Agent(
             name="SupportBot",
-            instructions="You are a helpful customer support agent. Be polite and remember conversation history for each user.",
-            model=self.model
+            instructions="You are a helpful customer support agent. Be polite and remember conversation history for each user."
         )
 
     def session_for(self, customer_id: str):

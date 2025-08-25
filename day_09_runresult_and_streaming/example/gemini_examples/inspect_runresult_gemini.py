@@ -2,16 +2,16 @@ from agents import Agent, Runner, OpenAIChatCompletionsModel
 from agents.tools import function_tool
 from openai import AsyncOpenAI
 import os
+from datetime import datetime
+import pytz
 
-# Gemini client setup
 client = AsyncOpenAI(
-    api_key="GEMINI_API_KEY",
+    api_key="your-gemini-api-key",
     base_url="https://generativelanguage.googleapis.com/v1beta/openai/"
 )
 
-# Gemini model
 model = OpenAIChatCompletionsModel(
-    model="gemini-2.5-flash",
+    model="gemini-1.5-flash",
     openai_client=client
 )
 
@@ -25,8 +25,6 @@ def get_current_time(timezone: str = "UTC") -> str:
     Returns:
         A string representing the current time.
     """
-    from datetime import datetime
-    import pytz
     try:
         tz = pytz.timezone(timezone)
         now = datetime.now(tz)
@@ -38,7 +36,7 @@ agent = Agent(
     name="TimeAgent",
     instructions="You are a helpful assistant that can tell the current time.",
     tools=[get_current_time],
-    model=model # Added model
+    model=model
 )
 
 print("Running TimeAgent...")
@@ -53,7 +51,7 @@ print("\nNew Items (Chronological Events):")
 for item in result.new_items:
     print(f"  - Type: {type(item).__name__}")
     if hasattr(item, 'text'):
-        print(f"    Text: {item.text[:50]}...") # Print first 50 chars of text
+        print(f"    Text: {item.text[:50]}...")
     if hasattr(item, 'tool_name'):
         print(f"    Tool Called: {item.tool_name}")
         print(f"    Tool Args: {item.tool_args}")

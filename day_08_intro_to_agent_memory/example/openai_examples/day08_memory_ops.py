@@ -1,4 +1,3 @@
-# day08_memory_ops.py
 import asyncio
 from agents import SQLiteSession
 

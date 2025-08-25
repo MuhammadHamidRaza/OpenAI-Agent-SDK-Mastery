@@ -1,22 +1,8 @@
-# day08_correction.py
 import asyncio
-from agents import Agent, Runner, SQLiteSession, OpenAIChatCompletionsModel
-from openai import AsyncOpenAI
+from agents import Agent, Runner, SQLiteSession
 
 async def main():
-    # Gemini client setup
-    client = AsyncOpenAI(
-        api_key="GEMINI_API_KEY",
-        base_url="https://generativelanguage.googleapis.com/v1beta/openai/"
-    )
-
-    # Gemini model
-    model = OpenAIChatCompletionsModel(
-        model="gemini-2.5-flash",
-        openai_client=client
-    )
-
-    agent = Agent(name="Calc", instructions="Answer math questions simply.", model=model)
+    agent = Agent(name="Calc", instructions="Answer math questions simply.")
     session = SQLiteSession("correction_example")
 
     # initial wrong question/answer

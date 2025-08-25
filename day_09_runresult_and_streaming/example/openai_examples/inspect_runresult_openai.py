@@ -3,8 +3,6 @@ from agents import function_tool
 import os
 from datetime import datetime
 import pytz
-# Ensure the OpenAI API key is set
-# os.environ["OPENAI_API_KEY"] = "YOUR_OPENAI_API_KEY" 
 
 if "OPENAI_API_KEY" not in os.environ:
     print("Please set the OPENAI_API_KEY environment variable.")
@@ -20,7 +18,6 @@ def get_current_time(timezone: str = "UTC") -> str:
     Returns:
         A string representing the current time.
     """
-
     try:
         tz = pytz.timezone(timezone)
         now = datetime.now(tz)
@@ -46,7 +43,7 @@ print("\nNew Items (Chronological Events):")
 for item in result.new_items:
     print(f"  - Type: {type(item).__name__}")
     if hasattr(item, 'text'):
-        print(f"    Text: {item.text[:50]}...") # Print first 50 chars of text
+        print(f"    Text: {item.text[:50]}...")
     if hasattr(item, 'tool_name'):
         print(f"    Tool Called: {item.tool_name}")
         print(f"    Tool Args: {item.tool_args}")
