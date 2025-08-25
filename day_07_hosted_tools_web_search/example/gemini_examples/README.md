@@ -52,7 +52,7 @@ To run these examples, you will need a Google API Key and a Custom Search Engine
 
 *   **Purpose:** This script implements a "CafeFinder" agent that recommends coffee shops in San Francisco. It leverages both web search for current weather and shop information, and a custom `user_preferences` tool for personalized recommendations.
 *   **Key Concepts Demonstrated:**
-    *   **Gemini Model Integration:** Uses `OpenAIChatCompletionsModel` with a Gemini client (`gemini-1.5-flash`).
+    *   **Gemini Model Integration:** Uses `OpenAIChatCompletionsModel` with a Gemini client (`gemini-2.5-flash`).
     *   **Custom Tools:** Defines `web_search` (for Google Custom Search API) and `user_preferences` (a simulated tool to fetch user data). Both are decorated with `@function_tool`.
     *   **Agent Instructions:** The agent's instructions guide it to use the available tools for a specific task (coffee shop recommendation).
     *   **Asynchronous Execution:** The `main` function uses `asyncio.run` to execute the agent asynchronously.
@@ -64,7 +64,7 @@ To run these examples, you will need a Google API Key and a Custom Search Engine
 *   **Purpose:** This script demonstrates an asynchronous agent that performs web searches using the Google Custom Search API.
 *   **Key Concepts Demonstrated:**
     *   **Asynchronous Agent Execution:** The agent is run using `Runner.run`, which is an asynchronous call.
-    *   **Gemini Model Integration:** Similar to `coffee_recommender_gemini.py`, it uses `OpenAIChatCompletionsModel` with a Gemini client (`gemini-1.5-flash`).
+    *   **Gemini Model Integration:** Similar to `coffee_recommender_gemini.py`, it uses `OpenAIChatCompletionsModel` with a Gemini client (`gemini-2.5-flash`).
     *   **Web Search Tool:** Defines a `web_search` tool using `@function_tool` to interact with the Google Custom Search API.
 *   **How it Works:** The agent is given a prompt (e.g., "What are the top headlines about climate technology today?"). It then uses the `web_search` tool to find relevant information and returns the `final_output`.
 *   **Setup:** Requires `GOOGLE_API_KEY`, `Search_Engine_Id`, and `GEMINI_API_KEY`.
