@@ -1,3 +1,4 @@
+# sync_run.py
 from agents import Agent, Runner
 
 agent = Agent(name='Assistant', instructions='Answer concisely.')

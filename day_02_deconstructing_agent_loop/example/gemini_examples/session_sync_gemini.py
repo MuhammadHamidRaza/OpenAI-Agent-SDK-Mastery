@@ -1,3 +1,4 @@
+# session_sync.py
 from agents import Agent, Runner, SQLiteSession, OpenAIChatCompletionsModel
 from openai import AsyncOpenAI
 
@@ -9,7 +10,7 @@ client = AsyncOpenAI(
 
 # ✅ Gemini model
 model = OpenAIChatCompletionsModel(
-    model="gemini-2.5-flash",
+    model="gemini-1.5-flash",
     openai_client=client
 )
 
@@ -18,6 +19,5 @@ session = SQLiteSession('conversation_123')
 
 res1 = Runner.run_sync(agent, 'What city is the Golden Gate Bridge in?', session=session)
 print('1:', res1.final_output)
-
 res2 = Runner.run_sync(agent, 'What state is it in?', session=session)
 print('2:', res2.final_output)
